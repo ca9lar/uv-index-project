@@ -12,9 +12,8 @@ resource "aws_lambda_function" "uv_index_alert" {
 
   environment {
     variables = {
-      UV_API_KEY        = var.uv_api_key
-      SNS_TOPIC_ARN     = aws_sns_topic.uv_alerts.arn
-      GEOCODING_API_KEY = var.geocoding_api_key
+      API_KEY        = var.api_key
+      SNS_TOPIC_ARN  = aws_sns_topic.uv_alerts.arn
     }
   }
 }
@@ -130,12 +129,8 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
 }
 
-variable "uv_api_key" {
-  description = "API key for the UV index service"
-}
-
-variable "geocoding_api_key" {
-  description = "API key for the geocoding service"
+variable "api_key" {
+  description = "API key for the OpenWeatherMap service"
 }
 
 output "api_endpoint" {

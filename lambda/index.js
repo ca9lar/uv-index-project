@@ -2,7 +2,7 @@ const https = require('https');
 const AWS = require('aws-sdk');
 const sns = new AWS.SNS();
 
-const uvApiKey = process.env.UV_API_KEY;
+const apiKey = process.env.API_KEY;
 const snsTopicArn = process.env.SNS_TOPIC_ARN;
 const zipCode = '85226'; // Chandler, AZ ZIP code
 
@@ -36,7 +36,6 @@ exports.handler = async (event) => {
 
 function getCoordinates(zip) {
   return new Promise((resolve, reject) => {
-    const apiKey = process.env.GEOCODING_API_KEY; // Add your geocoding API key to the Lambda environment variables
     const url = `https://api.openweathermap.org/geo/1.0/zip?zip=${zip},US&appid=${apiKey}`;
 
     https.get(url, (res) => {
@@ -58,7 +57,7 @@ function getCoordinates(zip) {
 
 function getUVIndex(lat, lon) {
   return new Promise((resolve, reject) => {
-    const url = `https://api.openweathermap.org/data/2.5/uvi?appid=${uvApiKey}&lat=${lat}&lon=${lon}`;
+    const url = `https://api.openweathermap.org/data/2.5/uvi?appid=${apiKey}&lat=${lat}&lon=${lon}`;
 
     https.get(url, (res) => {
       let data = '';

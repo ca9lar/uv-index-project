@@ -1,14 +1,14 @@
-name: Deploy Lambda and Infrastructure
+name: Plan and Deploy Lambda and Infrastructure
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  terraform-plan:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -26,6 +26,13 @@ jobs:
       run: zip -j lambda_function.zip lambda/index.js
       working-directory: .
 
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -33,13 +40,54 @@ jobs:
       run: terraform init
       working-directory: ./terraform
 
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -var 'uv_api_key=${{ secrets.UV_API_KEY }}' -var 'geocoding_api_key=${{ secrets.GEOCODING_API_KEY }}'
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -out=tfplan -var 'api_key=${{ secrets.API_KEY }}'
       working-directory: ./terraform
 
-    - name: Store Terraform Outputs
-      id: tf_outputs
-      run: |
-        echo "::set-output name=api_endpoint::$(terraform output -raw api_endpoint)"
-        echo "::set-output name=api_key::$(terraform output -raw api_key)"
+    - name: Upload Plan
+      uses: actions/upload-artifact@v2
+      with:
+        name: tfplan
+        path: ./terraform/tfplan
+
+  terraform-apply:
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.event.inputs.approve == 'true'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: ./lambda
+
+    - name: Zip Lambda function
+      run: zip -j lambda_function.zip lambda/index.js
+      working-directory: .
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Download Plan
+      uses: actions/download-artifact@v2
+      with:
+        name: tfplan
+        path: ./terraform
+
+    - name: Terraform Apply
+      run: terraform apply tfplan -var 'api_key=${{ secrets.API_KEY }}'
       working-directory: ./terraform
