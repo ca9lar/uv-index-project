@@ -1,0 +1,45 @@
+name: Deploy Lambda and Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: ./lambda
+
+    - name: Zip Lambda function
+      run: zip -j lambda_function.zip lambda/index.js
+      working-directory: .
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./terraform
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve -var 'uv_api_key=${{ secrets.UV_API_KEY }}' -var 'geocoding_api_key=${{ secrets.GEOCODING_API_KEY }}'
+      working-directory: ./terraform
+
+    - name: Store Terraform Outputs
+      id: tf_outputs
+      run: |
+        echo "::set-output name=api_endpoint::$(terraform output -raw api_endpoint)"
+        echo "::set-output name=api_key::$(terraform output -raw api_key)"
+      working-directory: ./terraform
