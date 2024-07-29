@@ -3,12 +3,12 @@ provider "aws" {
 }
 
 resource "aws_lambda_function" "uv_index_alert" {
-  filename         = "lambda_function.zip"
+  filename         = "../lambda_function.zip"
   function_name    = "UVIndexAlert"
   role             = aws_iam_role.lambda_exec.arn
   handler          = "index.handler"
   runtime          = "nodejs14.x"
-  source_code_hash = filebase64sha256("lambda_function.zip")
+  source_code_hash = filebase64sha256("../lambda_function.zip")
 
   environment {
     variables = {
@@ -127,6 +127,10 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   key_id        = aws_api_gateway_api_key.api_key.id
   key_type      = "API_KEY"
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
+}
+
+variable "api_key" {
+  description = "API key for the OpenWeatherMap service"
 }
 
 output "api_endpoint" {

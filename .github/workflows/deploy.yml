@@ -23,7 +23,7 @@ jobs:
       working-directory: ./lambda
 
     - name: Zip Lambda function
-      run: zip -j lambda_function.zip index.js
+      run: zip -j ../lambda_function.zip index.js
       working-directory: ./lambda
 
     - name: Configure AWS credentials
@@ -69,7 +69,7 @@ jobs:
       working-directory: ./lambda
 
     - name: Zip Lambda function
-      run: zip -j lambda_function.zip index.js
+      run: zip -j ../lambda_function.zip index.js
       working-directory: ./lambda
 
     - name: Configure AWS credentials
