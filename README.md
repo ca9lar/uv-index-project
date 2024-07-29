@@ -3,17 +3,8 @@
 This project provides an automated UV index alert system using AWS services and Terraform.
 
 ## Architecture Diagram
-   User
-     |
-     v
-API Gateway ------> Lambda Function ------> Geocoding API
-     ^                     |
-     |                     v
-CloudWatch Events -----> UV Index API
-     |
-     v
-  SNS Topic ------> User (or multiple endpoints)
 
+![Architecture Diagram](path/to/your/diagram.png)
 
 ## Description
 
@@ -34,4 +25,3 @@ CloudWatch Events -----> UV Index API
    - **GitHub Actions**: Automates the deployment process.
      - Fetches secrets (AWS credentials and API key) from GitHub Secrets.
      - Plans and applies the Terraform configuration.
-
