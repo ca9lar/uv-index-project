@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: tfplan
-        path: ./terraform/tfplan
+        path: tfplan
 
   terraform-apply:
     runs-on: ubuntu-latest
