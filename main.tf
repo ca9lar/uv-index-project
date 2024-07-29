@@ -129,10 +129,6 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
 }
 
-variable "api_key" {
-  description = "API key for the OpenWeatherMap service"
-}
-
 output "api_endpoint" {
   value = "${aws_api_gateway_deployment.api_deployment.invoke_url}/trigger"
 }
