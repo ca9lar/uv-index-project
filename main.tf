@@ -3,12 +3,12 @@ provider "aws" {
 }
 
 resource "aws_lambda_function" "uv_index_alert" {
-  filename         = "../lambda_function.zip"
+  filename         = "./lambda/lambda_function.zip"
   function_name    = "UVIndexAlert"
   role             = aws_iam_role.lambda_exec.arn
   handler          = "index.handler"
   runtime          = "nodejs14.x"
-  source_code_hash = filebase64sha256("../lambda_function.zip")
+  source_code_hash = filebase64sha256("./lambda/lambda_function.zip")
 
   environment {
     variables = {
