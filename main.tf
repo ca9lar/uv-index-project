@@ -12,8 +12,8 @@ resource "aws_lambda_function" "uv_index_alert" {
 
   environment {
     variables = {
-      API_KEY        = var.api_key
-      SNS_TOPIC_ARN  = aws_sns_topic.uv_alerts.arn
+      API_KEY       = var.api_key
+      SNS_TOPIC_ARN = aws_sns_topic.uv_alerts.arn
     }
   }
 }
@@ -44,8 +44,8 @@ resource "aws_sns_topic" "uv_alerts" {
 }
 
 resource "aws_cloudwatch_event_rule" "every_hour" {
-  name        = "EveryHour"
-  description = "Trigger Lambda every hour"
+  name                = "EveryHour"
+  description         = "Trigger Lambda every hour"
   schedule_expression = "rate(1 hour)"
 }
 
@@ -103,7 +103,7 @@ resource "aws_lambda_permission" "api_gateway" {
 }
 
 resource "aws_api_gateway_deployment" "api_deployment" {
-  depends_on = [aws_api_gateway_method.uv_index_method]
+  depends_on  = [aws_api_gateway_method.uv_index_method]
   rest_api_id = aws_api_gateway_rest_api.uv_index_api.id
   stage_name  = "v1"
 }
@@ -134,5 +134,6 @@ output "api_endpoint" {
 }
 
 output "api_key" {
-  value = aws_api_gateway_api_key.api_key.value
+  value     = aws_api_gateway_api_key.api_key.value
+  sensitive = true
 }
